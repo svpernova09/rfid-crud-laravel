@@ -25,9 +25,9 @@ if(is_file($database_path . $database_name)){
 }
 if($_SESSION['logged_in']){
     if($debug){ echo "<!-- Found Logged in Session -->"; }
-    header('/admin.php');
+    header('Location: admin.php');
 }
 // initial checks done
-header('/login.php');
+header('Location: login.php');
 
 ?>
