@@ -21,7 +21,7 @@ if(is_file($database_path . $database_name)){
 } else {
     ?>
     Database not found. Please view the README.md for installation notes.<BR>
-<?php
+    <?php
 }
 if($_SESSION['logged_in']){
     if($debug){ echo "<!-- Found Logged in Session -->"; }
