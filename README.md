@@ -1,5 +1,12 @@
 rfid-php-crud
 
+Requirements
+===
+
+* PHP5
+* SQLite database
+
+
 Installation
 ===
 

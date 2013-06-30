@@ -4,7 +4,8 @@
  * User: halo
  * Date: 6/30/13
  * Time: 2:51 PM
- * 
+ *
  */
-
-$database_path = '';
+$debug = 1;
+$database_path = '/'; // MUST end with a /
+$database_name = 'database.sqlite';
