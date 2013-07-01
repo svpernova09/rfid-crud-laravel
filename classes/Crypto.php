@@ -12,8 +12,9 @@ class Crypto {
         $salt = '$1$' . substr(microtime(),0,8);
         return crypt($pin, $salt);
     }
-    public function Checkthis($pin,$key){
-
+    public function CheckThis($pin,$salt){
+        $this_salt = '$1$' . $salt;
+        return crypt($pin,$this_salt);
     }
 }
 ?>
