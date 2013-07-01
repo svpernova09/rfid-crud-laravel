@@ -28,7 +28,7 @@ try{
     echo "<pre>";
     var_dump($data);
     echo "</pre>";
-    $stored_hash = $data['hash'];
+    $stored_hash = $data['0']['hash'];
 } catch(PDOException $e) {
     print 'Exception : '.$e->getMessage();
 }

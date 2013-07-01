@@ -30,7 +30,7 @@
                 type: 'POST',
                 data: fields,
                 success: function(data){
-                    window.location = "/admin.php";
+                    //window.location = "/admin.php";
 
                 }
             });
