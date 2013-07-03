@@ -115,6 +115,7 @@ if((($supplied_hash == $user_hash) && $data['0']['isAdmin']) || ($_COOKIE['logge
             if($errors['status'] == 'success'){
                 ?>
                 Update Successful<BR>
+                <a href="admin.php">Back to Admin</a>
                 <?php
             } else {
                 $error_msg = "Failed to Update";

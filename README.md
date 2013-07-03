@@ -7,6 +7,11 @@ Requirements
 * SQLite database
 
 
+Purpose
+===
+This is designed to be stupid simple, yet functional code to manipulate a  sqlite database.
+
+
 Installation
 ===
 
