@@ -158,6 +158,7 @@ if((($supplied_hash == $user_hash) && $data['0']['isAdmin']) || ($_COOKIE['logge
 
 } else {
     //login failed
-    header('Location: /login.php');
+    $msg = urldecode("Invalid Login");
+    header('Location: /login.php?msg=' . $msg);
 }
 ?>
