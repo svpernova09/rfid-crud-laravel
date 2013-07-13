@@ -6,6 +6,7 @@
  * Time: 3:07 PM
  * 
  */
+session_start();
 // initial checks
 if(is_file('config/config.php')){
     include('config/config.php');

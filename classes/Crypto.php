@@ -16,5 +16,9 @@ class Crypto {
         $this_salt = '$1$' . $salt;
         return crypt($pin,$this_salt);
     }
+    public function ParseHash($hash){
+        $hash_parts = explode('$',$hash);
+        return $hash_parts;
+    }
 }
 ?>

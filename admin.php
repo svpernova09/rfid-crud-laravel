@@ -7,6 +7,7 @@
  * 
  */
 // Admin Functions
+session_start();
 include(dirname(__FILE__) . '/config/config.php');
 if(isset($_POST['pin'])){
     $key = filter_var($_POST['pin'], FILTER_SANITIZE_STRING);
@@ -23,35 +24,14 @@ if(isset($_GET['key'])){
 if(isset($_GET['rowid'])){
     $rowid = filter_var($_GET['rowid'], FILTER_SANITIZE_STRING);
 }
-require_once(dirname(__FILE__) . '/lib/autoloader.php');
-$crypto = new Crypto();
-if(!$_COOKIE['logged_in']){
-    try{
-        //open the database
-        $db = new PDO('sqlite:' . $database_path . $database_name);
-        $params = array(':key' => $key);
-        $query = "SELECT * FROM users WHERE key = :key";
-        $rows = $db->prepare($query);
-        $rows->execute($params);
-        $data = $rows->fetchall();
-        // close the database connection
-        $errors = $db->errorInfo();
-        $db = NULL;
-        $stored_hash = $data['0']['hash'];
-    } catch(PDOException $e) {
-        print 'Exception : '.$e->getMessage();
-    }
-    $stored = explode('$',$stored_hash);
-    $supplied_check = $crypto->CheckThis($password, $stored['2']);
-    $supplied = explode('$',$supplied_check);
-    $user_hash = $stored['3'];
-    $supplied_hash = $supplied['3'];
+if(!isset($action)) {
+    $action = 'default';
 }
-if((($supplied_hash == $user_hash) && $data['0']['isAdmin']) || ($_COOKIE['logged_in'])){
-    //user authenticated
-    setcookie("logged_in", 1, time()+3600);  /* expires in 1 hour */
+require_once(dirname(__FILE__) . '/lib/autoloader.php');
+var_dump($_SESSION);
+if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'])){
     ?>
-    Welcome to admin <?php if(isset($data['0']['ircName'])) { echo $data['0']['ircName']; } ?><br>
+    Welcome to admin <?php if(isset($_SESSION['ircName'])) { echo $_SESSION['ircName']; } ?><br>
     <?php
     $crud = new Crud();
 
@@ -159,7 +139,7 @@ if((($supplied_hash == $user_hash) && $data['0']['isAdmin']) || ($_COOKIE['logge
 
 } else {
     //login failed
-    $msg = urldecode("Invalid Login");
-    header('Location: /login.php?msg=' . $msg);
+    $msg = urldecode("Please Log In");
+    //header('Location: /login.php?msg=' . $msg);
 }
 ?>

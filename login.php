@@ -6,8 +6,12 @@
  * Time: 3:27 PM
  * 
  */
+session_start();
 //show login form
-if(isset($_GET['msg']) && $_GET['msg'] == 'Invalid Login '){
+if(isset($_GET['msg']) && $_GET['msg'] == 'Invalid Login'){
+    $msg = filter_var($_GET['msg'], FILTER_SANITIZE_STRING);
+}
+if(isset($_GET['msg']) && $_GET['msg'] == 'Please Log In'){
     $msg = filter_var($_GET['msg'], FILTER_SANITIZE_STRING);
 }
 ?>
@@ -24,7 +28,7 @@ if(isset($_GET['msg']) && $_GET['msg'] == 'Invalid Login '){
                     <?php echo $msg; ?>
                 </div>
             <?php } ?>
-            <form name="login_form" id="login_form" action="admin.php" method="POST">
+            <form name="login_form" id="login_form" action="login-process.php" method="POST">
                 <input type="text" name="pin" id="pin" placeholder="PIN">
                 <input type="password" name="password" id="password" placeholder="password">
                 <input type="submit" name="submit" id="submit" value="submit">
