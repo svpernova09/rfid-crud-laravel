@@ -28,7 +28,7 @@ if(!isset($action)) {
     $action = 'default';
 }
 require_once(dirname(__FILE__) . '/lib/autoloader.php');
-var_dump($_SESSION);
+if($debug) { var_dump($_SESSION); }
 if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'])){
     ?>
     Welcome to admin <?php if(isset($_SESSION['ircName'])) { echo $_SESSION['ircName']; } ?><br>
