@@ -27,7 +27,6 @@ if(isset($_GET['rowid'])){
 if(!isset($action)) {
     $action = 'default';
 }
-require_once(dirname(__FILE__) . '/lib/autoloader.php');
 if($debug) { var_dump($_SESSION); }
 if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'])){
     ?>
@@ -41,7 +40,7 @@ if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'])){
         case "edit":
             $this_user = $crud->GetThisUser($key);
             ?>
-            <pre><!-- <?php var_dump($this_user);?> --></pre>
+            <pre><!-- <?php if($debug) { var_dump($this_user); } ?> --></pre>
             <?php
             if(count($this_user) == "1"){
                 //show edit form

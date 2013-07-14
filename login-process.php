@@ -21,7 +21,6 @@ if(isset($_GET['key'])){
 if(isset($_GET['rowid'])){
     $rowid = filter_var($_GET['rowid'], FILTER_SANITIZE_STRING);
 }
-require_once(dirname(__FILE__) . '/lib/autoloader.php');
 $crypto = new Crypto();
 
 try{
@@ -50,10 +49,18 @@ if((($supplied_hash == $user_hash) && $data['0']['isAdmin'])){
     setcookie("logged_in", 1, time()+3600);  /* expires in 1 hour */
     $_SESSION['logged_in'] = 1;
     $_SESSION['ircName'] = $data['0']['ircName'];
+    $_SESSION['key'] = $data['0']['key'];
     header('Location: /admin.php');
+} elseif((($supplied_hash == $user_hash) && !$data['0']['isAdmin'])){
+    //user authenticated - but not admin
+    setcookie("logged_in", 1, time()+3600);  /* expires in 1 hour */
+    $_SESSION['logged_in'] = 1;
+    $_SESSION['ircName'] = $data['0']['ircName'];
+    $_SESSION['key'] = $data['0']['key'];
+    header('Location: /user.php');
 } else {
     //login failed
     $msg = urldecode("Invalid Login");
-    //header('Location: /login.php?msg=' . $msg);
+    header('Location: /login.php?msg=' . $msg);
 }
 ?>
