@@ -12,13 +12,39 @@ class Crud extends Config {
     public function Crud(){
         $this->ext_conn = self::getDBConnection();
     }
-    public function Create(){
-
+    public function Create($data){
+        $this->ext_conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+        $params = $data;
+        $create_user = $this->ext_conn->prepare("INSERT INTO users (key,
+                                                                    hash,
+                                                                    ircName,
+                                                                    spokenName,
+                                                                    addedBy,
+                                                                    dateCreated,
+                                                                    isAdmin,
+                                                                    lastLogin,
+                                                                    isActive)
+                                                            VALUES (:key,
+                                                                    :hash,
+                                                                    :ircName,
+                                                                    :spokenName,
+                                                                    :addedBy,
+                                                                    :dateCreated,
+                                                                    :isAdmin,
+                                                                    :lastLogin,
+                                                                    :isActive)");
+        $create_user->execute($params);
+        if ($create_user->rowCount() == 1) {
+            return array('status' => 'success', 'id' => $this->ext_conn->lastInsertId());
+        } else {
+            return array('status' => 'failure', 'reason' => 'create_user_failed','ErrorInfo' => $create_user->errorInfo());
+        }
     }
     public function UpdateUser($data){
         $this->ext_conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
         $params = $data;
-        $update = $this->ext_conn->prepare("UPDATE users SET key = :key,
+        if(!empty($params[':hash'])){
+            $update = $this->ext_conn->prepare("UPDATE users SET key = :key,
                                                             hash = :hash,
                                                             ircName = :ircName,
                                                             spokenName = :spokenName,
@@ -28,8 +54,19 @@ class Crud extends Config {
                                                             lastLogin = :lastLogin,
                                                             isActive = :isActive
                                              WHERE rowid = :rowid");
+        } else {
+            $update = $this->ext_conn->prepare("UPDATE users SET key = :key,
+                                                            ircName = :ircName,
+                                                            spokenName = :spokenName,
+                                                            addedBy = :addedBy,
+                                                            dateCreated = :dateCreated,
+                                                            isAdmin = :isAdmin,
+                                                            lastLogin = :lastLogin,
+                                                            isActive = :isActive
+                                             WHERE rowid = :rowid");
+        }
 
-        $update->execute($data);
+        $update->execute($params);
 
         if ($update->errorCode() == '0000') {
             return array('status' => 'success', 'rowid' => $params[':rowid']);

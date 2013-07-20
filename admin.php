@@ -33,9 +33,62 @@ if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'])){
     Welcome to admin <?php if(isset($_SESSION['ircName'])) { echo $_SESSION['ircName']; } ?><br>
     <?php
     $crud = new Crud();
-
+    $crypto = new Crypto();
     switch($action){
         case "add":
+            if(isset($_POST)){
+                foreach($_POST AS $key => $value){
+                    $_POST[$key] = filter_var($value, FILTER_SANITIZE_STRING);
+                }
+            }
+            require_once('admin-menu.php');
+            ?>
+            <h2>New User</h2>
+            <form id="add_form" name="add_form" method="POST" action="admin.php?action=doadd">
+                <label for="key">Key: </label>
+                <input type="text" name="key" id="key" value="<?php if(isset($_POST['key'])) { echo $_POST['key']; } ?>"><br />
+                <label for="key">PIN: </label>
+                <input type="text" name="pin" id="pin" value="<?php if(isset($_POST['pin'])) { echo $_POST['pin']; } ?>"><br />
+                <label for="key">IRC Name: </label>
+                <input type="text" name="ircName" id="ircName" value="<?php if(isset($_POST['ircName'])) { echo $_POST['ircName']; } ?>"><br />
+                <label for="key">Spoken Name: </label>
+                <input type="text" name="spokenName" id="spokenName" value="<?php if(isset($_POST['spokenName'])) { echo $_POST['spokenName']; } ?>"><br />
+                <label for="key">Is Admin: </label>
+                <input type="text" name="isAdmin" id="isAdmin" value="<?php if(isset($_POST['isAdmin'])) { echo $_POST['isAdmin']; } ?>"><br />
+                <label for="key">Is Active: </label>
+                <input type="text" name="isActive" id="isActive" value="<?php if(isset($_POST['isActive'])) { echo $_POST['isActive']; } ?>"><br />
+                <input type="submit" name="submit" id="submit" value="submit">
+            </form>
+            <?php
+            break;
+        case "doadd":
+            if(isset($_POST)){
+                foreach($_POST AS $key => $value){
+                    $_POST[$key] = filter_var($value, FILTER_SANITIZE_STRING);
+                }
+            }
+            $date = new DateTime();
+            $hash = $crypto->SecureThis($_POST['pin']);
+            $addedBy = $_SESSION['key'];
+            $dateCreated = $date->getTimestamp();
+            $data = array(':key'=>$_POST['key'],
+                ':hash'=>$hash,
+                ':ircName'=>$_POST['ircName'],
+                ':spokenName'=>$_POST['spokenName'],
+                ':isAdmin'=>$_POST['isAdmin'],
+                ':isActive'=>$_POST['isActive']);
+            $errors = $crud->Create($data);
+            if($errors['status'] == 'success'){
+                ?>
+                Add User Successful<BR>
+                <a href="admin.php">Back to Admin</a>
+            <?php
+                var_dump($errors);
+            } else {
+                $error_msg = "Failed to Add";
+                echo $error_msg . "<br />";
+                var_dump($errors);
+            }
             break;
         case "edit":
             $this_user = $crud->GetThisUser($key);
@@ -44,13 +97,14 @@ if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'])){
             <?php
             if(count($this_user) == "1"){
                 //show edit form
+                require_once('admin-menu.php');
                 ?>
                 <h2>Editing <?php echo $this_user['0']['ircName']; ?></h2>
                 <form id="edit_form" name="edit_form" method="POST" action="admin.php?action=doedit&rowid=<?php echo $this_user['0']['rowid']; ?>">
                     <label for="key">Key: </label>
                     <input type="text" name="key" id="key" value="<?php echo $this_user['0']['key']; ?>"><br />
-                    <label for="key">Hash: </label>
-                    <input type="text" name="hash" id="hash" value="<?php echo $this_user['0']['hash']; ?>"><br />
+                    <label for="key">PIN: *leave blank to keep current PIN</label>
+                    <input type="text" name="pin" id="pin" value=""><br />
                     <label for="key">IRC Name: </label>
                     <input type="text" name="ircName" id="ircName" value="<?php echo $this_user['0']['ircName']; ?>"><br />
                     <label for="key">Spoken Name: </label>
@@ -73,15 +127,16 @@ if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'])){
             }
             break;
         case "doedit":
-
+            require_once('admin-menu.php');
             ?>
             Run the edit
             <?php
-            foreach($_POST AS $key => $value){
-                $_POST[$key] = filter_var($value, FILTER_SANITIZE_STRING);
+            if(isset($_POST)){
+                foreach($_POST AS $key => $value){
+                    $_POST[$key] = filter_var($value, FILTER_SANITIZE_STRING);
+                }
             }
             $data = array(':key'=>$_POST['key'],
-                            ':hash'=>$_POST['hash'],
                             ':ircName'=>$_POST['ircName'],
                             ':spokenName'=>$_POST['spokenName'],
                             ':addedBy'=>$_POST['addedBy'],
@@ -90,6 +145,11 @@ if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'])){
                             ':lastLogin'=>$_POST['lastLogin'],
                             ':isActive'=>$_POST['isActive'],
                             ':rowid'=>$rowid);
+            if(!empty($_POST['pin'])){
+                $hash = $crypto->SecureThis($_POST['pin']);
+                $data[':hash'] = $hash;
+
+            }
             $errors = $crud->UpdateUser($data);
             if($errors['status'] == 'success'){
                 ?>
@@ -103,6 +163,7 @@ if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'])){
             }
             break;
         default:
+            require_once('admin-menu.php');
             $all_users = $crud->GetAll();
             ?>
                 <pre><!-- <?php var_dump($all_users);?> --></pre>
