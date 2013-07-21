@@ -12,6 +12,22 @@ class Crud extends Config {
     public function Crud(){
         $this->ext_conn = self::getDBConnection();
     }
+    public function CleanKey($key){
+        $int_key = intval($key);
+        $clean_key = $int_key & 0x00FFFFFF;
+        return $clean_key;
+    }
+    public function Remove($rowid){
+        $params = array(':rowid' => $rowid);
+        $delete_user = $this->ext_conn->prepare("DELETE FROM users WHERE rowid = :rowid");
+        $affected_rows = $delete_user->execute($params);
+
+        if ($affected_rows == 1) {
+            return array('status' => 'success');
+        } else {
+            return array('status' => 'failure', 'reason' => 'delete_failed', 'rowcount' => $affected_rows, 'errornfo' => $delete_user->errorInfo());
+        }
+    }
     public function Create($data){
         $this->ext_conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
         $params = $data;
@@ -44,8 +60,7 @@ class Crud extends Config {
         $this->ext_conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
         $params = $data;
         if(!empty($params[':hash'])){
-            $update = $this->ext_conn->prepare("UPDATE users SET key = :key,
-                                                            hash = :hash,
+            $update = $this->ext_conn->prepare("UPDATE users SET hash = :hash,
                                                             ircName = :ircName,
                                                             spokenName = :spokenName,
                                                             addedBy = :addedBy,
@@ -55,8 +70,7 @@ class Crud extends Config {
                                                             isActive = :isActive
                                              WHERE rowid = :rowid");
         } else {
-            $update = $this->ext_conn->prepare("UPDATE users SET key = :key,
-                                                            ircName = :ircName,
+            $update = $this->ext_conn->prepare("UPDATE users SET ircName = :ircName,
                                                             spokenName = :spokenName,
                                                             addedBy = :addedBy,
                                                             dateCreated = :dateCreated,

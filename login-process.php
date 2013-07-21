@@ -10,7 +10,9 @@ session_unset();
 session_start();
 include(dirname(__FILE__) . '/config/config.php');
 if(isset($_POST['pin'])){
-    $key = filter_var($_POST['pin'], FILTER_SANITIZE_STRING);
+    $bad_key = filter_var($_POST['pin'], FILTER_SANITIZE_STRING);
+    $crud = new Crud();
+    $key = $crud->CleanKey($bad_key);
 }
 if(isset($_POST['password'])){
     $password = filter_var($_POST['password'], FILTER_SANITIZE_STRING);

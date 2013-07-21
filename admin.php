@@ -48,7 +48,7 @@ if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'])){
                 <label for="key">Key: </label>
                 <input type="text" name="key" id="key" value="<?php if(isset($_POST['key'])) { echo $_POST['key']; } ?>"><br />
                 <label for="key">PIN: </label>
-                <input type="text" name="pin" id="pin" value="<?php if(isset($_POST['pin'])) { echo $_POST['pin']; } ?>"><br />
+                <input type="password" name="pin" id="pin" value="<?php if(isset($_POST['pin'])) { echo $_POST['pin']; } ?>"><br />
                 <label for="key">IRC Name: </label>
                 <input type="text" name="ircName" id="ircName" value="<?php if(isset($_POST['ircName'])) { echo $_POST['ircName']; } ?>"><br />
                 <label for="key">Spoken Name: </label>
@@ -71,23 +71,27 @@ if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'])){
             $hash = $crypto->SecureThis($_POST['pin']);
             $addedBy = $_SESSION['key'];
             $dateCreated = $date->getTimestamp();
-            $data = array(':key'=>$_POST['key'],
+            $clean_key = $crud->CleanKey($_POST['key']);
+            $data = array(':key'=>$clean_key,
                 ':hash'=>$hash,
                 ':ircName'=>$_POST['ircName'],
                 ':spokenName'=>$_POST['spokenName'],
+                ':addedBy' =>$addedBy,
+                ':dateCreated' =>$dateCreated,
                 ':isAdmin'=>$_POST['isAdmin'],
                 ':isActive'=>$_POST['isActive']);
+            if($debug) { var_dump($data); }
             $errors = $crud->Create($data);
             if($errors['status'] == 'success'){
                 ?>
                 Add User Successful<BR>
                 <a href="admin.php">Back to Admin</a>
             <?php
-                var_dump($errors);
+                if($debug) { var_dump($errors); }
             } else {
                 $error_msg = "Failed to Add";
                 echo $error_msg . "<br />";
-                var_dump($errors);
+                if($debug) { var_dump($errors); }
             }
             break;
         case "edit":
@@ -102,9 +106,9 @@ if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'])){
                 <h2>Editing <?php echo $this_user['0']['ircName']; ?></h2>
                 <form id="edit_form" name="edit_form" method="POST" action="admin.php?action=doedit&rowid=<?php echo $this_user['0']['rowid']; ?>">
                     <label for="key">Key: </label>
-                    <input type="text" name="key" id="key" value="<?php echo $this_user['0']['key']; ?>"><br />
+                    <?php echo $this_user['0']['key']; ?><br />
                     <label for="key">PIN: *leave blank to keep current PIN</label>
-                    <input type="text" name="pin" id="pin" value=""><br />
+                    <input type="password" name="pin" id="pin" value=""><br />
                     <label for="key">IRC Name: </label>
                     <input type="text" name="ircName" id="ircName" value="<?php echo $this_user['0']['ircName']; ?>"><br />
                     <label for="key">Spoken Name: </label>
@@ -128,16 +132,12 @@ if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'])){
             break;
         case "doedit":
             require_once('admin-menu.php');
-            ?>
-            Run the edit
-            <?php
             if(isset($_POST)){
                 foreach($_POST AS $key => $value){
                     $_POST[$key] = filter_var($value, FILTER_SANITIZE_STRING);
                 }
             }
-            $data = array(':key'=>$_POST['key'],
-                            ':ircName'=>$_POST['ircName'],
+            $data = array(':ircName'=>$_POST['ircName'],
                             ':spokenName'=>$_POST['spokenName'],
                             ':addedBy'=>$_POST['addedBy'],
                             ':dateCreated'=>$_POST['dateCreated'],
@@ -159,14 +159,28 @@ if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'])){
             } else {
                 $error_msg = "Failed to Update";
                 echo $error_msg . "<br />";
-                var_dump($errors);
+                if($debug) { var_dump($errors); }
+            }
+            break;
+        case "delete":
+            $row_id = filter_var($_GET['rowid'], FILTER_SANITIZE_STRING);
+            $errors = $crud->Remove($row_id);
+            if($errors['status'] == 'success'){
+                ?>
+                Remove Successful<BR>
+                <a href="admin.php">Back to Admin</a>
+            <?php
+            } else {
+                $error_msg = "Failed to Remove";
+                echo $error_msg . "<br />";
+                if($debug) { var_dump($errors); }
             }
             break;
         default:
             require_once('admin-menu.php');
             $all_users = $crud->GetAll();
             ?>
-                <pre><!-- <?php var_dump($all_users);?> --></pre>
+                <pre><!-- <?php if($debug) { var_dump($all_users); } ?> --></pre>
                 <table>
                     <thead>
                     <tr>
@@ -175,6 +189,7 @@ if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'])){
                         <td>Admin</td>
                         <td>Active</td>
                         <td>Edit</td>
+                        <td>Delete</td>
                     </tr>
                     </thead>
                     <tbody>
@@ -187,6 +202,7 @@ if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'])){
                             <td><?php echo $user['isAdmin']; ?></td>
                             <td><?php echo $user['isActive']; ?></td>
                             <td><a href="admin.php?action=edit&key=<?php echo $user['key']; ?>">Edit</a></td>
+                            <td><a href="admin.php?action=delete&rowid=<?php echo $user['rowid']; ?>">Delete</a></td>
                         </tr>
                     <?php
                     }
