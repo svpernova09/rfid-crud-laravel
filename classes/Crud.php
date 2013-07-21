@@ -88,12 +88,45 @@ class Crud extends Config {
             return array('status' => 'failure', 'reason' => 'update_failed','error' => $update->errorInfo());
         }
     }
+    public function UpdateUserSelf($data){
+        $this->ext_conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+        $params = $data;
+        if(!empty($params[':hash'])){
+            $update = $this->ext_conn->prepare("UPDATE users SET hash = :hash,
+                                                            ircName = :ircName,
+                                                            spokenName = :spokenName
+                                             WHERE rowid = :rowid");
+        } else {
+            $update = $this->ext_conn->prepare("UPDATE users SET ircName = :ircName,
+                                                            spokenName = :spokenName
+                                             WHERE rowid = :rowid");
+        }
+
+        $update->execute($params);
+
+        if ($update->errorCode() == '0000') {
+            return array('status' => 'success', 'rowid' => $params[':rowid']);
+        } else {
+            return array('status' => 'failure', 'reason' => 'update_self_failed','error' => $update->errorInfo());
+        }
+    }
     public function Delete(){
 
     }
     public function GetThisUser($key){
         $params = array(':key' => $key);
         $query = "SELECT rowid,* FROM users WHERE key = :key";
+        $rows = $this->ext_conn->prepare($query);
+        $rows->execute($params);
+        $data = $rows->fetchall();
+        // close the database connection
+        $errors = $this->ext_conn->errorInfo();
+        $db = NULL;
+        return $data;
+    }
+    public function GetThisUserByRowId($rowid){
+        $params = array(':rowid' => $rowid);
+        $query = "SELECT rowid,* FROM users WHERE rowid = :rowid";
         $rows = $this->ext_conn->prepare($query);
         $rows->execute($params);
         $data = $rows->fetchall();
