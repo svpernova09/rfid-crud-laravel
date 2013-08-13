@@ -12,4 +12,6 @@
 $debug = 1;
 $database_path = '/'; // MUST end with a /
 $database_name = 'database.sqlite';
+$log_path = '/'; // MUST end with a /
+$log_name = 'rfid.log';
 require_once(dirname(__FILE__) . '/../lib/autoloader.php');
