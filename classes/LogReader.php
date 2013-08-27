@@ -8,8 +8,10 @@
  */
 
 class LogReader extends Config {
+    private static function init() {
 
-    public function LogReader(){
+    }
+    public function LogReader($config){
         $this->ext_conn = self::getDBConnection();
     }
 
@@ -17,7 +19,8 @@ class LogReader extends Config {
      * Get the entire log file
      */
     public function GetLogs(){
-
+        $lines = file($config['log_path'] . $config['log_name'], FILE_IGNORE_NEW_LINES);
+        return $lines;
     }
     /**
      * Get access granted logs

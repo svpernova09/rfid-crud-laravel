@@ -17,8 +17,10 @@ abstract class Config {
         } catch (PDOException $e) {
             echo $e->getMessage();
         }
+
     }
     public static function getDBConnection() {
+        include(dirname(__FILE__) . '/../config/config.php');
         if (!self::$ext_conn) self::init();
         return self::$ext_conn;
     }

@@ -10,5 +10,6 @@
 <div class="admin_menu">
     <a href="admin.php">Admin Home</a> |
     <a href="admin.php?action=add">Add User</a> |
+    <a href="admin.php?action=viewlogs">View logs</a> |
 
 </div>

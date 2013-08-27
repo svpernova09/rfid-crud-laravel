@@ -28,13 +28,26 @@ if(!isset($action)) {
     $action = 'default';
 }
 if($debug) { var_dump($_SESSION); }
-if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'])){
+if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'])){Checkin
     ?>
     Welcome to admin <?php if(isset($_SESSION['ircName'])) { echo $_SESSION['ircName']; } ?><br>
     <?php
     $crud = new Crud();
     $crypto = new Crypto();
+    $log_reader = new LogReader($config);
+
     switch($action){
+        case "viewlogs":
+            require_once('admin-menu.php');
+            ?>
+            <h2>View Logs</h2>
+            Log Path: <?php echo $config['log_path'];; ?><br />
+            Log File Name: <?php echo $config['log_name']; ?>
+
+            <?php
+            $lines = $log_reader->GetLogs();
+            if($debug) { var_dump($lines); }
+            break;
         case "add":
             if(isset($_POST)){
                 foreach($_POST AS $key => $value){
