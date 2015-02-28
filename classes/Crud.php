@@ -110,9 +110,6 @@ class Crud extends Config {
             return array('status' => 'failure', 'reason' => 'update_self_failed','error' => $update->errorInfo());
         }
     }
-    public function Delete(){
-
-    }
     public function GetThisUser($key){
         $params = array(':key' => $key);
         $query = "SELECT rowid,* FROM users WHERE key = :key";
